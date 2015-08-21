@@ -202,6 +202,10 @@ class TechDivision_MagentoUnitTesting_TestCase_Abstract
             ->will($this->returnCallback(array($this, '__callMageGetHelper')));
 
         $this->getMageMock()->expects($this->any())
+            ->method('registry')
+            ->will($this->returnCallback(array($this, '__callMageGetRegistry')));
+
+        $this->getMageMock()->expects($this->any())
             ->method('getResourceModel')
             ->will($this->returnCallback(array($this, '__callMageGetResourceModel')));
 
@@ -296,7 +300,6 @@ class TechDivision_MagentoUnitTesting_TestCase_Abstract
         $this->getMageAppMock()->expects($this->any())
             ->method('getRequest')
             ->will($this->returnValue($this->getMageRequestMock()));
-
     }
 
     /**
@@ -336,7 +339,6 @@ class TechDivision_MagentoUnitTesting_TestCase_Abstract
      */
     protected function _beforeInitInstance()
     {
-
     }
 
     /**
@@ -346,7 +348,6 @@ class TechDivision_MagentoUnitTesting_TestCase_Abstract
      */
     protected function _afterInitInstance()
     {
-
     }
 
 
@@ -441,6 +442,17 @@ class TechDivision_MagentoUnitTesting_TestCase_Abstract
     }
 
     /**
+     * callback function for Mage::Registry
+     *
+     * @return mixed
+     */
+    public function __callMageGetRegistry()
+    {
+        $args = func_get_args();
+        return $this->__executeMagicCall('Mage', 'registry', $args);
+    }
+
+    /**
      * callback function for Request::getParams() method
      *
      * @return mixed
@@ -466,7 +478,6 @@ class TechDivision_MagentoUnitTesting_TestCase_Abstract
         if (array_key_exists($key, $params)) {
             return $params[$key];
         }
-
     }
 
     /**
@@ -611,6 +622,18 @@ class TechDivision_MagentoUnitTesting_TestCase_Abstract
     public function addMageHelper($key, $value)
     {
         $this->__addMageData('helper', $key, $value);
+    }
+
+    /**
+     * Register a `$value` which will be returned if
+     * `Mage::registry($key)` is called
+     *
+     * @param $key
+     * @param $value
+     */
+    public function addMageRegistry($key, $value)
+    {
+        $this->__addMageData('registry', $key, $value);
     }
 
     /**
@@ -895,6 +918,27 @@ class TechDivision_MagentoUnitTesting_TestCase_Abstract
     }
 
     /**
+     * Call private or protected Method
+     *
+     * @param string $method
+     * @param array $params
+     * @param object $instance
+     *
+     * @return mixed
+     */
+    public function callPrivateMethod($method, $params, $instance = null)
+    {
+        if (is_null($instance)) {
+            $instance = $this->_instance;
+        }
+
+        $reflexion = new ReflectionClass($instance);
+        $method = $reflexion->getMethod($method);
+        $method->setAccessible(true);
+        return $method->invokeArgs($instance, $params);
+    }
+
+    /**
      * @param string      $class
      * @param string|null $key
      *
@@ -1163,5 +1207,4 @@ class TechDivision_MagentoUnitTesting_TestCase_Abstract
     {
         return new TechDivision_MagentoUnitTesting_Helper_Static_Mock($class);
     }
-
 }
