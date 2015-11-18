@@ -920,22 +920,15 @@ class TechDivision_MagentoUnitTesting_TestCase_Abstract
     /**
      * Call private or protected Method
      *
-     * @param string $method
-     * @param array $params
+     * @param string $methodName
+     * @param array $args
      * @param object $instance
      *
      * @return mixed
      */
-    public function callPrivateMethod($method, $params, $instance = null)
+    public function callPrivateMethod($methodName, $args, $instance = null)
     {
-        if (is_null($instance)) {
-            $instance = $this->_instance;
-        }
-
-        $reflexion = new ReflectionClass($instance);
-        $method = $reflexion->getMethod($method);
-        $method->setAccessible(true);
-        return $method->invokeArgs($instance, $params);
+        return $this->callMethod($methodName, $args, $instance);
     }
 
     /**
