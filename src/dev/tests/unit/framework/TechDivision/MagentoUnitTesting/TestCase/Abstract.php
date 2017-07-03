@@ -926,7 +926,7 @@ class TechDivision_MagentoUnitTesting_TestCase_Abstract
      *
      * @return mixed
      */
-    public function callPrivateMethod($methodName, $args, $instance = null)
+    public function callPrivateMethod($methodName, array $args = array(), $instance = null)
     {
         return $this->callMethod($methodName, $args, $instance);
     }
